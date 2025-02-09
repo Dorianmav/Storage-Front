@@ -14,6 +14,7 @@ interface SliderProps {
 
 interface HomePageProps {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
+
 }
 
 const HomePage: React.FC<HomePageProps> = ({ navigation }) => {
@@ -25,6 +26,10 @@ const HomePage: React.FC<HomePageProps> = ({ navigation }) => {
         <CustomButton 
           title="Voir les composants" 
           onPress={() => navigation.navigate('Components')}
+        />
+        <CustomButton 
+          title="Voir les mangas" 
+          onPress={() => navigation.navigate('MangaList')}
         />
       </View>
       <View style={styles.cardSection}>
