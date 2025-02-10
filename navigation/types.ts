@@ -2,6 +2,6 @@ export type RootStackParamList = {
   Home: undefined;
   Components: undefined;
   MangaList: undefined;
-  MangaPage: { mangaId: number };
+  MangaDetails: { itemId: number };
   // Add other screen names and their params here
 };

@@ -8,8 +8,10 @@ import React from 'react';
 import { StatusBar } from 'react-native';
 import QueryProvider from './context/QueryProvider';
 import MangaList from './pages/MangaList';
+import MangaViewPage from './pages/MangaViewPage';
+import { RootStackParamList } from './navigation/types';
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
@@ -35,10 +37,10 @@ export default function App() {
               name="MangaList"
               component={MangaList}
             />
-            {/* <Stack.Screen
-              name="MangaPage"
-              component={MangaPage}
-            /> */}
+            <Stack.Screen
+              name="MangaDetails"
+              component={MangaViewPage}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </QueryProvider>
