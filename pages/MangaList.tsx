@@ -27,7 +27,7 @@ const MangaList = () => {
     return mangas.filter(manga => 
       manga.titre.toLowerCase().includes(query) ||
       (manga.titreOriginal && manga.titreOriginal.toLowerCase().includes(query)) ||
-      (manga.auteur && manga.auteur.nom && manga.auteur.nom.toLowerCase().includes(query))
+      (manga.Auteur && manga.Auteur.nom && manga.Auteur.nom.toLowerCase().includes(query))
     );
   }, [mangas, searchQuery]);
 

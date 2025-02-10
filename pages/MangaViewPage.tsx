@@ -57,17 +57,24 @@ const MangaViewPage: React.FC<Props> = ({ route }: Props) => {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Volumes</Text>
-        <View style={styles.volumesGrid}>
-          {manga.volumes?.map((volume, index) => (
-            <View key={volume.id} style={styles.volumeContainer}>
-              <VolumeCard
-                content={volume}
-                onAcheteChange={handleAcheteChange}
-              />
-            </View>
-          ))}
-        </View>
+        <ScrollView>
+        {manga.Volumes && manga.Volumes.length > 0 ? (
+          <View style={styles.volumesGrid}>
+            {manga.Volumes.map((volume) => (
+              <View key={volume.id} style={styles.volumeContainer}>
+                <VolumeCard
+                  content={volume}
+                  onAcheteChange={(volumeId: number, achete: boolean) => handleAcheteChange(volumeId, achete)}
+                />
+              </View>
+            ))}
+          </View>
+        ) : (
+          <Text style={styles.noVolumes}>Aucun volume disponible</Text>
+        )}
+        </ScrollView>
       </View>
+      <View style={styles.bottomPadding} />
     </ScrollView>
   );
 };
@@ -104,6 +111,15 @@ const styles = StyleSheet.create({
   },
   volumeContainer: {
     width: '48%',
+  },
+  noVolumes: {
+    textAlign: 'center',
+    color: Colors.text,
+    fontSize: 16,
+    marginTop: 10,
+  },
+  bottomPadding: {
+    height: 30,
   },
 });
 

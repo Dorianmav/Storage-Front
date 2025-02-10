@@ -80,7 +80,7 @@ export const mangaApi = {
   // Récupérer un manga par son ID
   getMangaById: async (id: number): Promise<ApiResponse<Manga>> => {
     try {
-      const { data } = await api.get<Manga>(`mangas/${id}`);
+      const { data } = await api.get<Manga>(`mangas/${id}?include=volumes,auteur,editeurVF,editeurVO,genres,themes`);
       return { data };
     } catch (error) {
       const axiosError = error as AxiosError<ApiErrorResponse>;

@@ -38,7 +38,7 @@ export const CardDetails = ({ content }: CardDetailsProps) => {
                         </Text>
                         <Text style={styles.text}>
                             <Text style={styles.label}>Auteur : </Text>
-                            {content.auteur?.nom || 'Non disponible'}
+                            {content.Auteur?.nom || 'Non disponible'}
                         </Text>
                         <Text style={styles.text}>
                             <Text style={styles.label}>Éditeur VF : </Text>
