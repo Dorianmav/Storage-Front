@@ -22,35 +22,35 @@ export const CardDetails = ({ content }: CardDetailsProps) => {
                     <View style={styles.textContainer}>
                         <Text style={styles.text} numberOfLines={2}>
                             <Text style={styles.label}>Titre original : </Text>
-                            {content.titreOriginal}
+                            {content.titreOriginal || 'Non disponible'}
                         </Text>
                         <Text style={styles.text}>
                             <Text style={styles.label}>Origine : </Text>
-                            {content.origine}
+                            {content.origine || 'Non disponible'}
                         </Text>
                         <Text style={styles.text}>
                             <Text style={styles.label}>Type : </Text>
-                            {content.type}
+                            {content.type || 'Non disponible'}
                         </Text>
                         <Text style={styles.text}>
                             <Text style={styles.label}>Année VF : </Text>
-                            {content.anneeVF}
+                            {content.anneeVF || 'Non disponible'}
                         </Text>
                         <Text style={styles.text}>
                             <Text style={styles.label}>Auteur : </Text>
-                            {content.auteur.nom}
+                            {content.auteur?.nom || 'Non disponible'}
                         </Text>
                         <Text style={styles.text}>
                             <Text style={styles.label}>Éditeur VF : </Text>
-                            {content.editeurVF.nom}
+                            {content.editeurVF?.nom || 'Non disponible'}
                         </Text>
                         <Text style={styles.text}>
                             <Text style={styles.label}>Volumes : </Text>
-                            {content.nbVolumesVF} (VO: {content.nbVolumesVO})
+                            {content.nbVolumesVF || '?'} (VO: {content.nbVolumesVO || '?'})
                         </Text>
                         <Text style={styles.text}>
                             <Text style={styles.label}>Prix : </Text>
-                            {content.prix}
+                            {content.prix || 'Non disponible'}
                         </Text>
                         {/* <Text style={styles.progressText}>
                             41 / {content.nbVolumesVF}
