@@ -2,20 +2,22 @@ import React from 'react';
 import { StyleSheet, View, Image, Text, Dimensions, TouchableOpacity, Platform } from 'react-native';
 import { Manga } from '../models/Manga';
 import Colors from '../constants/colors';
+import { CardSize, getCardWidth, cardSizeStyles } from '../constants/cardSizes';
 
 type CardProps = {
     content: Manga;
     onPress?: () => void;
+    size?: CardSize;
+    itemsPerRow?: number;
 };
 
-const { width } = Dimensions.get('window');
-// Calculer la largeur de la carte en prenant en compte les marges
-const cardWidth = (width - 40) / 2; // 40 = padding total (15 * 2 + 10 entre les cartes)
+export const Card = ({ content, onPress, size = 'medium', itemsPerRow = 2 }: CardProps) => {
+    const cardWidth = getCardWidth(size, itemsPerRow);
+    const sizeStyle = cardSizeStyles[size];
 
-export const Card = ({ content, onPress }: CardProps) => {
     return (
         <TouchableOpacity 
-            style={styles.container}
+            style={[styles.container, { width: cardWidth }]}
             onPress={onPress}
             activeOpacity={0.8}
         >
@@ -26,8 +28,8 @@ export const Card = ({ content, onPress }: CardProps) => {
                     resizeMode="cover"
                 />
             </View>
-            <View style={styles.titleContainer}>
-                <Text style={styles.title} numberOfLines={2}>
+            <View style={[styles.titleContainer, { padding: sizeStyle.padding }]}>
+                <Text style={[styles.title, { fontSize: sizeStyle.fontSize }]} numberOfLines={2}>
                     {content.titre}
                 </Text>
             </View>
@@ -37,7 +39,6 @@ export const Card = ({ content, onPress }: CardProps) => {
 
 const styles = StyleSheet.create({
     container: {
-        width: cardWidth,
         backgroundColor: Colors.neutral,
         borderRadius: 15,
         overflow: 'hidden',
@@ -68,11 +69,9 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     titleContainer: {
-        padding: 10,
         backgroundColor: Colors.neutral,
     },
     title: {
-        fontSize: 14,
         fontWeight: '600',
         textAlign: 'center',
         color: '#333',

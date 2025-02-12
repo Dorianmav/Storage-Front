@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Image, Dimensions, TouchableOpacity, Platform } from 'react-native';
+import { StyleSheet, View, Image, TouchableOpacity, Platform } from 'react-native';
 import { Volume } from '../models/Manga';
 import Colors from '../constants/colors';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import { CardSize, getCardWidth, cardSizeStyles } from '../constants/cardSizes';
 
 type VolumeCardProps = {
     content: Volume;
     onPress?: () => void;
     onAcheteChange?: (volumeId: number, achete: boolean) => void;
+    size?: CardSize;
+    itemsPerRow?: number;
 };
 
-const { width } = Dimensions.get('window');
-const cardWidth = (width - 40) / 2;
-
-export const VolumeCard = ({ content, onPress, onAcheteChange }: VolumeCardProps) => {
+export const VolumeCard = ({ content, onPress, onAcheteChange, size = 'medium', itemsPerRow = 2 }: VolumeCardProps) => {
     const [isChecked, setChecked] = useState(content.achete || false);
+    const cardWidth = getCardWidth(size, itemsPerRow);
+    const sizeStyle = cardSizeStyles[size];
 
     const handleCheckboxPress = (checked: boolean) => {
         setChecked(checked);
@@ -25,7 +27,7 @@ export const VolumeCard = ({ content, onPress, onAcheteChange }: VolumeCardProps
 
     return (
         <TouchableOpacity 
-            style={styles.container}
+            style={[styles.container, { width: cardWidth }]}
             onPress={onPress}
             activeOpacity={0.8}
         >
@@ -36,15 +38,16 @@ export const VolumeCard = ({ content, onPress, onAcheteChange }: VolumeCardProps
                     resizeMode="cover"
                 />
             </View>
-            <View style={styles.checkboxContainer}>
+            <View style={[styles.checkboxContainer, { padding: sizeStyle.padding }]}>
                 <BouncyCheckbox
-                    size={20}
+                    size={size === 'small' ? 12 : size === 'large' ? 20 : 16}
                     fillColor={Colors.accent}
                     unFillColor="#FFFFFF"
                     text="Acheté"
                     textStyle={{
                         textDecorationLine: "none",
                         color: '#333',
+                        fontSize: sizeStyle.fontSize,
                     }}
                     iconStyle={{ borderColor: Colors.accent }}
                     onPress={handleCheckboxPress}
@@ -57,7 +60,6 @@ export const VolumeCard = ({ content, onPress, onAcheteChange }: VolumeCardProps
 
 const styles = StyleSheet.create({
     container: {
-        width: cardWidth,
         backgroundColor: Colors.neutral,
         borderRadius: 15,
         overflow: 'hidden',
@@ -88,7 +90,6 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     checkboxContainer: {
-        padding: 10,
         alignItems: 'center',
         justifyContent: 'center',
     },
