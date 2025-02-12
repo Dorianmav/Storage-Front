@@ -65,6 +65,8 @@ const MangaViewPage: React.FC<Props> = ({ route }: Props) => {
                 <VolumeCard
                   content={volume}
                   onAcheteChange={(volumeId: number, achete: boolean) => handleAcheteChange(volumeId, achete)}
+                  size="medium"
+                  itemsPerRow={4}
                 />
               </View>
             ))}
@@ -94,8 +96,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   section: {
-    padding: 15,
-    marginBottom: 20,
+    padding: 5,
+    marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 18,
@@ -106,11 +108,11 @@ const styles = StyleSheet.create({
   volumesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 15,
+    // justifyContent: 'space-between',
+    gap: 10,
   },
   volumeContainer: {
-    width: '48%',
+    width: '23%',
   },
   noVolumes: {
     textAlign: 'center',

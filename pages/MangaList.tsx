@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { StyleSheet, View, FlatList, ActivityIndicator, Text, Dimensions } from 'react-native';
+import { StyleSheet, View, ScrollView, ActivityIndicator, Text } from 'react-native';
 import { useMangas } from '../hooks/useMangas';
 import Colors from '../constants/colors';
 import { Card } from '../components/Card';
@@ -8,16 +8,28 @@ import SearchBar from '../components/SearchBar';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useNavigation } from '@react-navigation/native';
+import { CardSize } from '../constants/cardSizes';
 
-const { width } = Dimensions.get('window');
-const numColumns = 2;
-const gap = 15;
-const cardWidth = (width - (gap * (numColumns + 1))) / numColumns;
+// Configuration par défaut - vous pouvez ajuster ces valeurs selon vos préférences
+const DEFAULT_CONFIG = {
+  numColumns: 4,
+  gap: 10,
+  cardSize: 'medium' as CardSize,
+};
 
 const MangaList = () => {
   const { data: mangas, isLoading, error } = useMangas();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'MangaList'>>();
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Vous pouvez ajuster ces valeurs selon vos préférences
+  const config = {
+    ...DEFAULT_CONFIG,
+    // Décommentez et modifiez ces lignes pour personnaliser l'affichage
+    // numColumns: 3, // Nombre de colonnes (2, 3, 4, etc.)
+    // gap: 15, // Espacement entre les cartes
+    // cardSize: 'large' as CardSize, // Taille des cartes ('small', 'medium', 'large')
+  };
 
   const filteredMangas = useMemo(() => {
     if (!mangas) return [];
@@ -47,13 +59,16 @@ const MangaList = () => {
     );
   }
 
-  // Fonction pour transformer la liste en paires pour l'affichage en grille
-  const renderItem = ({ item }: { item: Manga }) => (
-    <View style={styles.cardContainer}>
-      <Card
-        content={item}
-        onPress={() => navigation.navigate('MangaDetails', { itemId: item.id })}
-      />
+  const renderItem = (item: Manga) => (
+    <View key={item.id} style={[styles.cardContainer, { width: `${100 / config.numColumns}%` }]}>
+      <View style={{ padding: config.gap / 2 }}>
+        <Card
+          content={item}
+          onPress={() => navigation.navigate('MangaDetails', { itemId: item.id })}
+          size={config.cardSize}
+          itemsPerRow={config.numColumns}
+        />
+      </View>
     </View>
   );
 
@@ -62,15 +77,11 @@ const MangaList = () => {
       <SearchBar 
         onSearch={setSearchQuery}
       />
-      <FlatList
-        data={filteredMangas}
-        renderItem={renderItem}
-        keyExtractor={item => item.id.toString()}
-        numColumns={numColumns}
-        columnWrapperStyle={styles.row}
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-      />
+      <ScrollView>
+        <View style={styles.grid}>
+          {filteredMangas.map(renderItem)}
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -89,15 +100,13 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 16,
   },
-  list: {
-    padding: gap,
-  },
-  row: {
-    justifyContent: 'space-between',
-    marginBottom: gap,
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: DEFAULT_CONFIG.gap / 2,
   },
   cardContainer: {
-    width: cardWidth,
+    flexDirection: 'column',
   },
 });
 
