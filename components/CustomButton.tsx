@@ -1,24 +1,64 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Platform, GestureResponderEvent } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Platform, GestureResponderEvent, ViewStyle } from 'react-native';
 import Colors from '../constants/colors';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 interface CustomButtonProps {
-  title: string;
+  title?: string;
   onPress: (event: GestureResponderEvent) => void;
   icon?: keyof typeof FontAwesome.glyphMap;
+  variant?: 'default' | 'round';
+  iconSize?: number;
+  style?: ViewStyle;
+  disabled?: boolean;
 }
 
-const CustomButton: React.FC<CustomButtonProps> = ({ title, onPress, icon }) => {
+const CustomButton: React.FC<CustomButtonProps> = ({ 
+  title, 
+  onPress, 
+  icon, 
+  variant = 'default',
+  iconSize = 20,
+  style,
+  disabled
+}) => {
+  const buttonStyle = [
+    styles.button,
+    variant === 'round' && styles.roundButton,
+    style,
+    disabled && styles.disabledButton
+  ];
+
+  const contentStyle = [
+    styles.buttonContent,
+    variant === 'round' && styles.roundButtonContent
+  ];
+
   return (
     <TouchableOpacity 
-      style={styles.button} 
+      style={buttonStyle} 
       onPress={onPress}
-      activeOpacity={0.7}
+      activeOpacity={0.8}
+      disabled={disabled}
     >
-      <View style={styles.buttonContent}>
-        {icon && <FontAwesome name={icon} size={10} color="#fff" />}
-        <Text style={[styles.buttonText, !icon && styles.centeredText]}>{title}</Text>
+      <View style={contentStyle}>
+        {icon && (
+          <FontAwesome 
+            name={icon} 
+            size={iconSize} 
+            color="#fff" 
+            style={title ? styles.iconWithText : undefined}
+          />
+        )}
+        {title && (
+          <Text style={[
+            styles.buttonText, 
+            !icon && styles.centeredText,
+            disabled && styles.disabledText 
+          ]}>
+            {title}
+          </Text>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -43,19 +83,54 @@ const styles = StyleSheet.create({
       },
     }),
   },
+  roundButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    padding: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    backgroundColor: Colors.primary,
+    zIndex: 1000,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
   buttonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
+  },
+  roundButtonContent: {
+    flexDirection: 'column',
   },
   buttonText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 16,
     fontWeight: '600',
-    marginLeft: 5,
   },
   centeredText: {
     textAlign: 'center',
+  },
+  iconWithText: {
+    marginRight: 8,
+  },
+  disabledText: {
+    color: '#666',
+  },
+  disabledButton: {
+    backgroundColor: '#999',
   },
 });
 

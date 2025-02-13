@@ -9,6 +9,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useNavigation } from '@react-navigation/native';
 import { CardSize } from '../constants/cardSizes';
+import CustomButton from '../components/CustomButton';
+import CreateMangaModal from '../components/CreateMangaModal';
 
 // Configuration par défaut - vous pouvez ajuster ces valeurs selon vos préférences
 const DEFAULT_CONFIG = {
@@ -21,6 +23,7 @@ const MangaList = () => {
   const { data: mangas, isLoading, error } = useMangas();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'MangaList'>>();
   const [searchQuery, setSearchQuery] = useState('');
+  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
 
   // Vous pouvez ajuster ces valeurs selon vos préférences
   const config = {
@@ -36,7 +39,7 @@ const MangaList = () => {
     if (!searchQuery.trim()) return mangas;
 
     const query = searchQuery.toLowerCase().trim();
-    return mangas.filter(manga => 
+    return mangas.filter(manga =>
       manga.titre.toLowerCase().includes(query) ||
       (manga.titreOriginal && manga.titreOriginal.toLowerCase().includes(query)) ||
       (manga.Auteur && manga.Auteur.nom && manga.Auteur.nom.toLowerCase().includes(query))
@@ -74,14 +77,26 @@ const MangaList = () => {
 
   return (
     <View style={styles.container}>
-      <SearchBar 
-        onSearch={setSearchQuery}
+      <View style={styles.content}>
+        <SearchBar
+          onSearch={setSearchQuery}
+        />
+        <ScrollView>
+          <View style={styles.grid}>
+            {filteredMangas.map(renderItem)}
+          </View>
+        </ScrollView>
+      </View>
+      <CustomButton
+        icon='plus'
+        onPress={() => setIsCreateModalVisible(true)}
+        variant='round'
+        iconSize={24}
       />
-      <ScrollView>
-        <View style={styles.grid}>
-          {filteredMangas.map(renderItem)}
-        </View>
-      </ScrollView>
+      <CreateMangaModal
+        visible={isCreateModalVisible}
+        onClose={() => setIsCreateModalVisible(false)}
+      />
     </View>
   );
 };
@@ -90,6 +105,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  content: {
+    flex: 1,
   },
   centered: {
     flex: 1,
