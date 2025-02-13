@@ -7,7 +7,7 @@ interface CustomButtonProps {
   title?: string;
   onPress: (event: GestureResponderEvent) => void;
   icon?: keyof typeof FontAwesome.glyphMap;
-  variant?: 'default' | 'round';
+  variant?: 'default' | 'round' | 'roundInline';
   iconSize?: number;
   style?: ViewStyle;
   disabled?: boolean;
@@ -25,13 +25,14 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   const buttonStyle = [
     styles.button,
     variant === 'round' && styles.roundButton,
+    variant === 'roundInline' && styles.roundInlineButton,
     style,
     disabled && styles.disabledButton
   ];
 
   const contentStyle = [
     styles.buttonContent,
-    variant === 'round' && styles.roundButtonContent
+    (variant === 'round' || variant === 'roundInline') && styles.roundButtonContent
   ];
 
   return (
@@ -104,6 +105,27 @@ const styles = StyleSheet.create({
       },
       android: {
         elevation: 8,
+      },
+    }),
+  },
+  roundInlineButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    padding: 0,
+    margin: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.accent,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+      },
+      android: {
+        elevation: 4,
       },
     }),
   },

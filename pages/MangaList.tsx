@@ -78,9 +78,19 @@ const MangaList = () => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <SearchBar
-          onSearch={setSearchQuery}
-        />
+        <View style={styles.headerContainer}>
+          <View style={styles.searchBarWrapper}>
+            <SearchBar
+              onSearch={setSearchQuery}
+            />
+          </View>
+          <CustomButton
+            icon="filter"
+            onPress={() => setIsCreateModalVisible(true)}
+            variant="roundInline"
+            iconSize={15}
+          />
+        </View>
         <ScrollView>
           <View style={styles.grid}>
             {filteredMangas.map(renderItem)}
@@ -88,9 +98,9 @@ const MangaList = () => {
         </ScrollView>
       </View>
       <CustomButton
-        icon='plus'
+        icon="plus"
         onPress={() => setIsCreateModalVisible(true)}
-        variant='round'
+        variant="round"
         iconSize={24}
       />
       <CreateMangaModal
@@ -125,6 +135,22 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     flexDirection: 'column',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    gap: 10,
+  },
+  searchBarWrapper: {
+    width: '85%',
+  },
+  filterButton: {
+    width: 40,
+    height: 40,
+    padding: 0,
+    backgroundColor: Colors.accent,
+    borderRadius: 20,
   },
 });
 
