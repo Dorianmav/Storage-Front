@@ -1,6 +1,8 @@
 import axios, { AxiosError } from 'axios';
 import { Manga } from '../models/Manga';
 import { Platform } from 'react-native';
+import { config } from '../config/config';
+import { mockMangaApi } from './mockApi';
 
 // In development, use the local IP for Android/iOS and localhost for web
 const DEV_API_URL = Platform.select({
@@ -34,7 +36,7 @@ api.interceptors.response.use(
   }
 );
 
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
   data?: T;
   error?: string;
 }
@@ -43,7 +45,8 @@ interface ApiErrorResponse {
   message: string;
 }
 
-export const mangaApi = {
+// Export l'API appropriée en fonction de la configuration
+export const mangaApi = config.useMocks ? mockMangaApi : {
   // Récupérer tous les mangas
   getAllMangas: async (): Promise<ApiResponse<Manga[]>> => {
     try {
