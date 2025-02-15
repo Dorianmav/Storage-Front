@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { StyleSheet, View, ScrollView, ActivityIndicator, Text } from 'react-native';
-import { useMangas } from '../hooks/useMangas';
+import { useMangas, useFilters } from '../hooks/useMangas';
 import Colors from '../constants/colors';
 import { Card } from '../components/Card';
 import { Manga } from '../models/Manga';
@@ -9,8 +9,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useNavigation } from '@react-navigation/native';
 import { CardSize } from '../constants/cardSizes';
+import CustomFilterButton from '../components/CustomFilterButton';
 import CustomButton from '../components/CustomButton';
 import CreateMangaModal from '../components/CreateMangaModal';
+import { FilterItem, convertFiltersResponseToItems } from '../models/Filter';
+import AlphabetFilter from '../components/AlphabetFilter';
 
 // Configuration par défaut - vous pouvez ajuster ces valeurs selon vos préférences
 const DEFAULT_CONFIG = {
@@ -21,9 +24,22 @@ const DEFAULT_CONFIG = {
 
 const MangaList = () => {
   const { data: mangas, isLoading, error } = useMangas();
+  const { data: filtersData, isLoading: filtersLoading } = useFilters();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'MangaList'>>();
-  const [searchQuery, setSearchQuery] = useState('');
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedFilters, setSelectedFilters] = useState<FilterItem[]>([]);
+  const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
+
+  const filters = useMemo(() => {
+    if (!filtersData) return [];
+    const convertedFilters = convertFiltersResponseToItems(filtersData);
+    return convertedFilters;
+  }, [filtersData]);
+
+  const handleFilterChange = (newFilters: FilterItem[]) => {
+    setSelectedFilters(newFilters);
+  };
 
   // Vous pouvez ajuster ces valeurs selon vos préférences
   const config = {
@@ -36,17 +52,56 @@ const MangaList = () => {
 
   const filteredMangas = useMemo(() => {
     if (!mangas) return [];
-    if (!searchQuery.trim()) return mangas;
 
-    const query = searchQuery.toLowerCase().trim();
-    return mangas.filter(manga =>
-      manga.titre.toLowerCase().includes(query) ||
-      (manga.titreOriginal && manga.titreOriginal.toLowerCase().includes(query)) ||
-      (manga.Auteur && manga.Auteur.nom && manga.Auteur.nom.toLowerCase().includes(query))
-    );
-  }, [mangas, searchQuery]);
+    // Filtrer d'abord par recherche textuelle
+    let filtered = mangas;
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(manga =>
+        manga.titre.toLowerCase().includes(query) ||
+        (manga.titreOriginal && manga.titreOriginal.toLowerCase().includes(query)) ||
+        (manga.Auteur && manga.Auteur.nom && manga.Auteur.nom.toLowerCase().includes(query))
+      );
+    }
 
-  if (isLoading) {
+    // Filtrer par lettre si sélectionnée
+    if (selectedLetter) {
+      filtered = filtered.filter(manga => {
+        const firstChar = manga.titre.charAt(0).toUpperCase();
+        if (selectedLetter === '#') {
+          // Si on sélectionne #, on montre tous les titres qui commencent par un caractère non alphabétique
+          return !/^[A-Z]/.test(firstChar);
+        }
+        return firstChar === selectedLetter;
+      });
+    }
+
+    // Ensuite, appliquer les filtres sélectionnés
+    if (selectedFilters.length > 0) {
+      filtered = filtered.filter(manga => {
+        return selectedFilters.every(filter => {
+          switch (filter.type) {
+            case 'Genre':
+              return manga.Genres?.some(genre => genre.id === filter.id);
+            case 'Theme':
+              return manga.Themes?.some(theme => theme.id === filter.id);
+            case 'Auteur':
+              return manga.Auteur?.id === filter.id;
+            case 'Editeur':
+              return manga.editeurVF?.id === filter.id || manga.editeurVO?.id === filter.id;
+            default:
+              return true;
+          }
+        });
+      });
+    }
+
+    return filtered;
+  }, [mangas, searchQuery, selectedFilters, selectedLetter]);
+
+
+
+  if (isLoading || filtersLoading) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color={Colors.primary} />
@@ -84,13 +139,16 @@ const MangaList = () => {
               onSearch={setSearchQuery}
             />
           </View>
-          <CustomButton
-            icon="filter"
-            onPress={() => setIsCreateModalVisible(true)}
-            variant="roundInline"
-            iconSize={15}
+          <CustomFilterButton
+            items={filters}
+            onSelectItem={handleFilterChange}
+            selectedItems={selectedFilters}
           />
         </View>
+        <AlphabetFilter
+          onLetterSelect={setSelectedLetter}
+          selectedLetter={selectedLetter}
+        />
         <ScrollView>
           <View style={styles.grid}>
             {filteredMangas.map(renderItem)}
@@ -134,13 +192,13 @@ const styles = StyleSheet.create({
     padding: DEFAULT_CONFIG.gap / 2,
   },
   cardContainer: {
-    flexDirection: 'column',
+    alignItems: 'center',
   },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
-    gap: 10,
+    padding: DEFAULT_CONFIG.gap,
+    gap: DEFAULT_CONFIG.gap,
   },
   searchBarWrapper: {
     width: '85%',
