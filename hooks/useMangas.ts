@@ -1,11 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { mangaApi } from '../api/api';
+import { FiltersResponse } from '../models/Filter';
+import { Manga } from '../models/Manga';
 
 // Clés pour React Query
-const QUERY_KEYS = {
-  mangas: ['mangas'],
-  manga: (id: number) => ['manga', id],
-  search: (query: string) => ['mangas', 'search', query],
+export const QUERY_KEYS = {
+  mangas: ['mangas'] as const,
+  manga: (id: number) => ['manga', id] as const,
+  search: (query: string) => ['mangas', 'search', query] as const,
+  filters: ['filters'] as const,
+  treeLastMangas: ['treeLastMangas'] as const,
 };
 
 // Hook pour récupérer tous les mangas
@@ -17,6 +21,34 @@ export const useMangas = () => {
       if (response.error) throw new Error(response.error);
       return response.data;
     },
+  });
+};
+
+// Hook pour avoir tous les filtres
+export const useFilters = () => {
+  return useQuery<FiltersResponse, Error>({
+    queryKey: QUERY_KEYS.filters,
+    queryFn: async () => {
+      const response = await mangaApi.getFilters();
+      if (response.error) throw new Error(response.error);
+      if (!response.data) throw new Error('Aucune donnée reçue');
+      return response.data;
+    },
+  });
+};
+
+// Hook pour récupérer les derniers mangas
+export const useTreeLastMangas = () => {
+  return useQuery<Manga[]>({
+    queryKey: QUERY_KEYS.treeLastMangas,
+    queryFn: async () => {
+      const response = await mangaApi.getTreeLastMangas();
+      if (response.error) throw new Error(response.error);
+      return response.data || [];
+    },
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    staleTime: 1000, // Les données sont considérées comme périmées après 1 seconde
   });
 };
 
@@ -67,17 +99,17 @@ export const useDeleteManga = () => {
 };
 
 // Hook pour rechercher des mangas
-export const useSearchMangas = (query: string) => {
-  return useQuery({
-    queryKey: QUERY_KEYS.search(query),
-    queryFn: async () => {
-      const response = await mangaApi.searchMangasByTitle(query);
-      if (response.error) throw new Error(response.error);
-      return response.data;
-    },
-    enabled: !!query,
-  });
-};
+// export const useSearchMangas = (query: string) => {
+//   return useQuery({
+//     queryKey: QUERY_KEYS.search(query),
+//     queryFn: async () => {
+//       const response = await mangaApi.searchMangasByTitle(query);
+//       if (response.error) throw new Error(response.error);
+//       return response.data;
+//     },
+//     enabled: !!query,
+//   });
+// };
 
 // Hook pour mettre à jour le statut d'un volume
 export const useUpdateVolumeStatus = () => {
