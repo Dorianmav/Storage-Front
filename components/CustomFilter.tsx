@@ -177,15 +177,16 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontWeight: '600',
     color: Colors.text,
+    fontWeight: '600',
   },
   content: {
     backgroundColor: Colors.background,
     padding: 16,
+    paddingBottom: 8, 
   },
   categoryContainer: {
-    marginBottom: 16,
+    marginBottom: 12, 
   },
   categoryTitle: {
     fontSize: 14,
@@ -198,7 +199,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    marginTop: 12,
+    marginTop: 8, 
   },
   filterItem: {
     backgroundColor: Colors.neutral,
