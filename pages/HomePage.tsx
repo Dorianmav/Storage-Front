@@ -20,10 +20,6 @@ const HomePage: React.FC<HomePageProps> = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.title}>MonStockage</Text>
       <View style={styles.buttonContainer}>
-        <CustomButton
-          title="Voir les composants"
-          onPress={() => navigation.navigate('Components')}
-        />
         <View style={styles.sliderContainer}>
           {!isLoading && !error && mangaImages.length > 0 && (
             <CustomSlider
@@ -50,7 +46,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 30,
   },
   title: {
     fontSize: 24,

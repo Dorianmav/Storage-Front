@@ -7,13 +7,15 @@ import { Manga } from '../models/Manga';
 import SearchBar from '../components/SearchBar';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
-import { useNavigation } from '@react-navigation/native';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
 import { CardSize } from '../constants/cardSizes';
 import CustomFilterButton from '../components/CustomFilterButton';
 import CustomButton from '../components/CustomButton';
 import CreateMangaModal from '../components/CreateMangaModal';
 import { FilterItem, convertFiltersResponseToItems } from '../models/Filter';
 import AlphabetFilter from '../components/AlphabetFilter';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { AntDesign, MaterialCommunityIcons  } from '@expo/vector-icons';
 
 // Configuration par défaut - vous pouvez ajuster ces valeurs selon vos préférences
 const DEFAULT_CONFIG = {
@@ -22,7 +24,9 @@ const DEFAULT_CONFIG = {
   cardSize: 'medium' as CardSize,
 };
 
-const MangaList = () => {
+const MangaBottomTab = createBottomTabNavigator();
+
+const MangaListContent = () => {
   const { data: mangas, isLoading, error } = useMangas();
   const { data: filtersData, isLoading: filtersLoading } = useFilters();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'MangaList'>>();
@@ -169,6 +173,73 @@ const MangaList = () => {
   );
 };
 
+const HomeRedirect = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  
+  React.useEffect(() => {
+    const parent = navigation.getParent();
+    if (parent) {
+      parent.navigate('Home');
+    }
+  }, [navigation]);
+
+  return null;
+};
+
+const MangaCategories = () => {
+  return (
+    <View style={styles.container}>
+      <Text>Catégories</Text>
+    </View>
+  );
+};
+
+export default function MangaList() {
+  return (
+    <MangaBottomTab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.text,
+        tabBarStyle: {
+          backgroundColor: Colors.background,
+          borderTopWidth: 1,
+          borderTopColor: Colors.neutral,
+        },
+      }}
+    >
+      <MangaBottomTab.Screen
+        name="Liste"
+        component={MangaListContent}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="bookshelf" size={size} color={color} />
+          ),
+        }}
+      />
+      <MangaBottomTab.Screen
+        name="BackToHome"
+        component={HomeRedirect}
+        options={{
+          tabBarLabel: 'Accueil',
+          tabBarIcon: ({ color, size }) => (
+            <AntDesign name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <MangaBottomTab.Screen
+        name="Calendar"
+        component={MangaCategories}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <AntDesign name="calendar" size={size} color={color} />
+          ),
+        }}
+      />
+    </MangaBottomTab.Navigator>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -211,5 +282,3 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
 });
-
-export default MangaList;
