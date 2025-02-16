@@ -1,9 +1,9 @@
 import { Manga } from '../models/Manga';
-import { Auteur } from '../models/Auteur';
-import { Editeur } from '../models/Editeur';
-import { Genre } from '../models/Genre';
-import { Theme } from '../models/Theme';
-import { Volume } from '../models/Volume';
+import { Auteur } from '../src/features/manga/types/Auteur';
+import { Editeur } from '../src/features/manga/types/Editeur';
+import { Genre } from '../src/features/manga/types/Genre';
+import { Theme } from '../src/features/manga/types/Theme';
+import { Volume } from '../src/features/manga/types/Volume';
 
 export const mockEditeurs: Editeur[] = [
   { id: 1, nom: 'Glénat' },
