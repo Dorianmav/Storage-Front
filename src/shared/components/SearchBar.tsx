@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity, Platform } from 'react-native';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import Colors from '../constants/colors';
+import React from 'react';
+import { StyleSheet, TextInput, View, TouchableOpacity, Platform } from 'react-native';
+import Colors from '../../theme/colors';
+import { FontAwesome } from '@expo/vector-icons';
 
 interface SearchBarProps {
   onSearch: (text: string) => void;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
-  const [searchText, setSearchText] = useState<string>('');
+  const [searchText, setSearchText] = React.useState<string>('');
 
   const handleClear = (): void => {
     setSearchText('');

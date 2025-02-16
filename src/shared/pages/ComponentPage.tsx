@@ -1,44 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import Colors from '../constants/colors';
+import Colors from '../../theme/colors';
 import CustomButton from '../components/CustomButton';
 import CustomSlider from '../components/CustomSlider';
 import SearchBar from '../components/SearchBar';
-import { CardDetails } from '../components/CardDetails';
+import { CardDetails } from '../../features/manga/components/CardDetails';
 import { Card } from '../components/Card';
-import { VolumeCard } from '../components/VolumeCard';
-import { CustomTextArea } from '../components/CustomTextArea';
+import { VolumeCard } from '../../features/manga/components/VolumeCard';
+import { CustomTextArea } from '../../features/manga/components/CustomTextArea';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/types';
-import CustomFilter from '../components/CustomFilter';
+import { RootStackParamList } from '../../navigation/types';
+import CustomFilterTest from '../components/CustomFilter';
+import { FilterItem } from '../../features/manga/types/Filter';
+import AlphabetFilter from '../components/AlphabetFilter';
 
 type ComponentPageNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Components'>;
-interface FilterItem {
-    id: number;
-    name: string;
-}
 
 const ComponentPage = () => {
     const navigation = useNavigation<ComponentPageNavigationProp>();
     const [selectedFilters, setSelectedFilters] = useState<FilterItem[]>([]);
-
-    const genres = [
-        { id: 1, name: 'Action' },
-        { id: 2, name: 'Adventure' },
-        { id: 3, name: 'Comedy' },
-        { id: 4, name: 'Drama' },
-        { id: 5, name: 'Fantasy' },
-        { id: 6, name: 'Love' },
-        { id: 7, name: 'SF' },
-        { id: 8, name: 'Thriller' },
-    ];
-
-    const handleFilterChange = (selectedItems: FilterItem[]) => {
-        setSelectedFilters(selectedItems);
-        // Here you can implement your filter logic
-        console.log('Selected filters:', selectedItems);
-    };
+    const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
+    const [filters, setFilters] = useState<FilterItem[]>([]);
     const [volumes, setVolumes] = useState([
         {
             id: 1,
@@ -78,6 +61,49 @@ const ComponentPage = () => {
         }
     ]);
 
+    const mockFilters = [
+        // Genres
+        { id: 1, type: "Genre" as const, name: 'Action' },
+        { id: 2, type: "Genre" as const, name: 'Comédie' },
+        { id: 3, type: "Genre" as const, name: 'Horreur' },
+        { id: 4, type: "Genre" as const, name: 'Mystère' },
+        { id: 5, type: "Genre" as const, name: 'Romance' },
+        // Thèmes
+        { id: 6, type: "Theme" as const, name: 'Adolescence' },
+        { id: 7, type: "Theme" as const, name: 'Aliens' },
+        { id: 8, type: "Theme" as const, name: 'Amour' },
+        { id: 9, type: "Theme" as const, name: 'Fantômes' },
+        // Auteurs
+        { id: 10, type: "Auteur" as const, name: 'Tatsu Yukinobu' },
+        { id: 11, type: "Auteur" as const, name: 'Akira Toriyama' },
+        { id: 12, type: "Auteur" as const, name: 'Eiichiro Oda' },
+        // Éditeurs
+        { id: 13, type: "Editeur" as const, name: 'Shueisha' },
+        { id: 14, type: "Editeur" as const, name: 'Crunchyroll' },
+        { id: 15, type: "Editeur" as const, name: 'Kodansha' },
+        // Format
+        { id: 16, type: "Format" as const, name: 'Manga' },
+        { id: 17, type: "Format" as const, name: 'Manhwa' },
+        { id: 18, type: "Format" as const, name: 'Manhua' },
+        // Langue
+        { id: 19, type: "Langue" as const, name: 'Japonais' },
+        { id: 20, type: "Langue" as const, name: 'Coréen' },
+        { id: 21, type: "Langue" as const, name: 'Chinois' },
+    ];
+
+    useEffect(() => {
+        setFilters(mockFilters);
+    }, []);
+
+    const handleFilterChange = (selectedItems: FilterItem[]) => {
+        setSelectedFilters(selectedItems);
+        console.log('Selected filters:', selectedItems);
+    };
+
+    const handleLetterSelect = (letter: string | null) => {
+        setSelectedLetter(letter);
+    };
+
     const manga = {
         id: 0,
         titre: 'Reborn',
@@ -93,12 +119,12 @@ const ComponentPage = () => {
         lastPublishedVolumeId: 1,
         comingSoonVolumeId: 2,
         finished: true,
-        auteur: { id: 0, nom: 'Akira Amano' },
+        Auteur: { id: 0, nom: 'Akira Amano' },
         editeurVO: { id: 0, nom: 'Shueisha' },
         editeurVF: { id: 0, nom: 'Glénat' },
-        genres: [],
-        themes: [],
-        volumes: []
+        Genres: [],
+        Themes: [],
+        Volumes: []
     };
 
     const images1 = [
@@ -138,11 +164,21 @@ const ComponentPage = () => {
                     icon="chevron-left"
                     onPress={() => navigation.navigate('Home')}
                 />
+                <CustomButton
+                    variant="round"
+                    icon="chevron-left"
+                    onPress={() => navigation.navigate('Home')}
+                />
             </View>
 
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>SearchBar</Text>
                 <SearchBar onSearch={handleSearch} />
+            </View>
+
+            <View style={styles.section}>
+                <Text style={styles.sectionTitle}>AlphabetFilter</Text>
+                <AlphabetFilter onLetterSelect={handleLetterSelect} selectedLetter={selectedLetter} />
             </View>
 
             <View style={styles.section}>
@@ -152,13 +188,13 @@ const ComponentPage = () => {
                         titre="Mangas"
                         images={images1}
                         size="mini"
-                        destination="Page1"
+                        onPress={() => alert('Mangas')}
                     />
                     <CustomSlider
                         titre="Animes"
                         images={images2}
                         size="mini"
-                        destination="Page2"
+                        onPress={() => alert('Animes')}
                     />
                 </View>
             </View>
@@ -214,10 +250,12 @@ const ComponentPage = () => {
             </View>
 
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>CustomFilter</Text>
-                <CustomFilter
-                    items={genres}
-                    onFilterChange={handleFilterChange}
+                <Text style={styles.sectionTitle}>CustomFilterTest</Text>
+                <CustomFilterTest
+                    title="Filtres"
+                    items={filters}
+                    onSelectItem={handleFilterChange}
+                    selectedItems={selectedFilters}
                 />
             </View>
 

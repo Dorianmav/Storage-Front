@@ -16,15 +16,29 @@ export interface Manga {
     nbVolumesVF: string
     prix: string
     synopsis: string
-    lastPublishedVolumeId: number
-    comingSoonVolumeId: number
+    lastPublishedVolumeId: number | null
+    comingSoonVolumeId: number | null
     finished: boolean
-    auteur: Auteur
+    Auteur: Auteur
     editeurVO: Editeur
     editeurVF: Editeur
-    genres: Genre[]
-    themes: Theme[]
-    volumes: Volume[] 
+    Genres: Genre[]
+    Themes: Theme[]
+    Volumes: Volume[]
+    lastPublishedVolume?: {
+        id: number
+        numero: string
+        titre: string
+        dateParution: string
+        url: string
+    }
+    comingSoonVolume?: {
+        id: number
+        numero: string
+        titre: string
+        dateParution: string
+        url: string
+    }
 }
 
 export { Volume }

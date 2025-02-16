@@ -1,7 +1,7 @@
 import React from 'react'
-import { Manga } from '../models/Manga'
+import { Manga } from '../types/Manga'
 import { Dimensions, Platform, StyleSheet, Text, View } from 'react-native'
-import Colors from '../constants/colors';
+import Colors from '../../../theme/colors';
 
 type CustomTextAreaProps = {
     content: Manga
@@ -14,7 +14,7 @@ const contentWidth = cardWidth * 0.55; // 55% de la largeur de la carte (5% pour
 export const CustomTextArea = ({ content }: CustomTextAreaProps) => {
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>{content.synopsis}</Text>
+            <Text style={styles.text}>{content.synopsis || 'Synopsis non disponible'}</Text>
         </View>
     )
 }
@@ -55,4 +55,3 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
     }
 });
-

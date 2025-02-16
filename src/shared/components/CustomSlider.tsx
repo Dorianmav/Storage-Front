@@ -1,28 +1,17 @@
-import React, { useRef, useState, useEffect } from 'react';
-import {
-  StyleSheet,
-  View,
-  Image,
-  Dimensions,
-  TouchableOpacity,
-  ScrollView,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  Text,
-  Platform,
-} from 'react-native';
-import Colors from '../constants/colors';
-
-const { width } = Dimensions.get('window');
+import React from 'react';
+import { StyleSheet, View, ScrollView, Dimensions, TouchableOpacity, Image, Text, Platform } from 'react-native';
+import Colors from '../../theme/colors';
 
 type SizeType = 'mini' | 'small' | 'medium' | 'large';
 
 type CustomSliderProps = {
   images: string[];
   size?: SizeType;
-  destination?: string;
   titre?: string;
+  onPress?: () => void;
 };
+
+const { width } = Dimensions.get('window');
 
 const SIZES: Record<SizeType, { width: number; height: number; padding: number; borderRadius: number }> = {
   mini: {
@@ -51,14 +40,14 @@ const SIZES: Record<SizeType, { width: number; height: number; padding: number; 
   },
 };
 
-const CustomSlider: React.FC<CustomSliderProps> = ({ images, size = 'medium', destination, titre }) => {
-  const scrollViewRef = useRef<ScrollView>(null);
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [isAutoScrolling, setIsAutoScrolling] = useState<boolean>(true);
+const CustomSlider: React.FC<CustomSliderProps> = ({ images, size = 'medium', titre, onPress }) => {
+  const scrollViewRef = React.createRef<ScrollView>();
+  const [currentIndex, setCurrentIndex] = React.useState<number>(0);
+  const [isAutoScrolling, setIsAutoScrolling] = React.useState<boolean>(true);
   
   const currentSize = SIZES[size] || SIZES.medium;
 
-  useEffect(() => {
+  React.useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isAutoScrolling && images.length > 1) {
       interval = setInterval(() => {
@@ -77,7 +66,7 @@ const CustomSlider: React.FC<CustomSliderProps> = ({ images, size = 'medium', de
     setCurrentIndex(index);
   };
 
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const handleScroll = (event: any) => {
     const contentOffset = event.nativeEvent.contentOffset.x;
     const index = Math.round(contentOffset / currentSize.width);
     if (index !== currentIndex) {
@@ -85,9 +74,9 @@ const CustomSlider: React.FC<CustomSliderProps> = ({ images, size = 'medium', de
     }
   };
 
-  const handlePress = (destination?: string) => {
-    if (destination) {
-      alert(`Naviguer vers la page ${destination}`);
+  const handlePress = () => {
+    if (onPress) {
+      onPress();
     }
   };
 
@@ -115,7 +104,7 @@ const CustomSlider: React.FC<CustomSliderProps> = ({ images, size = 'medium', de
               height: currentSize.height,
               borderRadius: currentSize.borderRadius - 5,
             }]}
-            onPress={() => handlePress(destination)}
+            onPress={handlePress}
           >
             <Image source={{ uri: image }} style={styles.image} />
           </TouchableOpacity>
