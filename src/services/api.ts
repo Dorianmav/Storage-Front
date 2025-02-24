@@ -7,12 +7,13 @@ import { FiltersResponse } from '../features/manga/types/Filter';
 
 // In development, use the local IP for Android/iOS and localhost for web
 const DEV_API_URL = Platform.select({
-  web: 'http://localhost:3000/api/',
+  web: 'http://209.38.193.7:3000/api/',
   default: 'http://10.0.2.2:3000/api/', // Special IP for Android emulator
 });
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || DEV_API_URL;
 
+console.log('API URL:', API_URL);
 export const api = axios.create({
   baseURL: API_URL,
   headers: {
