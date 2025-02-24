@@ -11,7 +11,7 @@ RUN apk add --no-cache git
 COPY package*.json ./
 
 # Install Expo CLI and app dependencies
-RUN npm install -g expo-cli
+RUN npm install expo-cli
 RUN npm install
 
 # Copy the rest of the app
