@@ -117,7 +117,7 @@ export const mangaApi: MangaApi = config.useMocks ? mockMangaApi : {
   // Récupérer les trois derniers mangas
   getTreeLastMangas: async (): Promise<ApiResponse<Manga[]>> => {
     try {
-      const { data } = await api.get<Manga[]>('/mangas/tree-last');
+      const { data } = await api.get<Manga[]>('/mangas/three-last');
       return { data };
     } catch (error) {
       const axiosError = error as AxiosError<ApiErrorResponse>;
