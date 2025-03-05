@@ -41,4 +41,13 @@ export interface Manga {
     }
 }
 
+/**
+ * Type pour les aperçus de manga (version légère)
+ */
+export interface MangaPreview {
+  id: number;
+  titre: string;
+  image: string;
+}
+
 export { Volume }
