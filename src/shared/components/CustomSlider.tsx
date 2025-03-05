@@ -1,11 +1,12 @@
 import React from 'react';
 import { StyleSheet, View, ScrollView, Dimensions, TouchableOpacity, Image, Text, Platform } from 'react-native';
 import Colors from '../../theme/colors';
+import { MangaPreview } from '../../features/manga/types/Manga';
 
 type SizeType = 'mini' | 'small' | 'medium' | 'large';
 
 type CustomSliderProps = {
-  images: string[];
+  mangaPreviews: MangaPreview[];
   size?: SizeType;
   titre?: string;
   onPress?: () => void;
@@ -40,7 +41,7 @@ const SIZES: Record<SizeType, { width: number; height: number; padding: number; 
   },
 };
 
-const CustomSlider: React.FC<CustomSliderProps> = ({ images, size = 'medium', titre, onPress }) => {
+const CustomSlider: React.FC<CustomSliderProps> = ({ mangaPreviews, size = 'medium', titre, onPress }) => {
   const scrollViewRef = React.createRef<ScrollView>();
   const [currentIndex, setCurrentIndex] = React.useState<number>(0);
   const [isAutoScrolling, setIsAutoScrolling] = React.useState<boolean>(true);
@@ -49,14 +50,14 @@ const CustomSlider: React.FC<CustomSliderProps> = ({ images, size = 'medium', ti
 
   React.useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (isAutoScrolling && images.length > 1) {
+    if (isAutoScrolling && mangaPreviews.length > 1) {
       interval = setInterval(() => {
-        const nextIndex = (currentIndex + 1) % images.length;
+        const nextIndex = (currentIndex + 1) % mangaPreviews.length;
         scrollToIndex(nextIndex);
       }, 3000);
     }
     return () => clearInterval(interval);
-  }, [currentIndex, isAutoScrolling, images.length]);
+  }, [currentIndex, isAutoScrolling, mangaPreviews.length]);
 
   const scrollToIndex = (index: number) => {
     scrollViewRef.current?.scrollTo({
@@ -86,7 +87,7 @@ const CustomSlider: React.FC<CustomSliderProps> = ({ images, size = 'medium', ti
       borderRadius: currentSize.borderRadius,
     }]}
     >
-      <Text style={styles.subtitle}>{titre}</Text>
+      {titre && <Text style={styles.subtitle}>{titre}</Text>}
       <ScrollView
         ref={scrollViewRef}
         horizontal
@@ -96,9 +97,9 @@ const CustomSlider: React.FC<CustomSliderProps> = ({ images, size = 'medium', ti
         scrollEventThrottle={16}
         style={[styles.scrollView, { width: currentSize.width }]}
       >
-        {images.map((image, index) => (
+        {mangaPreviews.map((manga, index) => (
           <TouchableOpacity
-            key={index}
+            key={manga.id}
             style={[styles.slideContainer, { 
               width: currentSize.width,
               height: currentSize.height,
@@ -106,13 +107,13 @@ const CustomSlider: React.FC<CustomSliderProps> = ({ images, size = 'medium', ti
             }]}
             onPress={handlePress}
           >
-            <Image source={{ uri: image }} style={styles.image} />
+            <Image source={{ uri: manga.image }} style={styles.image} />
           </TouchableOpacity>
         ))}
       </ScrollView>
 
       <View style={styles.pagination}>
-        {images.map((_, index) => (
+        {mangaPreviews.map((_, index) => (
           <TouchableOpacity
             key={index}
             onPress={() => scrollToIndex(index)}
