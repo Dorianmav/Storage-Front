@@ -5,7 +5,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { mangaApi } from '../../../services/api';
-import { Manga } from '../types/Manga';
+import { Manga, MangaPreview } from '../types/Manga';
 
 // Clés pour React Query
 export const QUERY_KEYS = {
@@ -52,10 +52,10 @@ export const useFilters = () => {
  * @returns {Object} Objet contenant les mangas, le statut de chargement et les erreurs
  */
 export const useTreeLastMangas = () => {
-  return useQuery<Manga[]>({
+  return useQuery<MangaPreview[]>({
     queryKey: QUERY_KEYS.treeLastMangas,
     queryFn: async () => {
-      const response = await mangaApi.getTreeLastMangas();
+      const response = await mangaApi.getThreeLastMangas();
       if (response.error) throw new Error(response.error);
       return response.data || [];
     },
