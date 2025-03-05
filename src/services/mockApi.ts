@@ -1,5 +1,5 @@
 import { ApiResponse, MangaApi } from './api';
-import { Manga } from '../features/manga/types/Manga';
+import { Manga, MangaPreview } from '../features/manga/types/Manga';
 import { mockMangas, mockAuteurs } from '../mocks/mangaData';
 import { FiltersResponse } from '../features/manga/types/Filter';
 
@@ -99,12 +99,22 @@ export const mockMangaApi: MangaApi = {
     return { data: mockFilters };
   },
 
-  async getTreeLastMangas(): Promise<ApiResponse<Manga[]>> {
-    await delay(500);
-    // Retourne les 3 derniers mangas ajoutés
-    const lastMangas = [...mockMangas]
-      .slice(0, 3);
-    return { data: lastMangas };
+  async getThreeLastMangas(): Promise<ApiResponse<MangaPreview[]>> {
+    try {
+      // Récupérer les 3 derniers mangas ajoutés
+      const lastMangas = [...mockMangas]
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 3)
+        .map(manga => ({
+          id: manga.id,
+          titre: manga.titre,
+          image: manga.image
+        }));
+
+      return { data: lastMangas };
+    } catch (error) {
+      return { error: 'Erreur lors de la récupération des derniers mangas' };
+    }
   },
 
   async searchMangasByTitle(query: string): Promise<ApiResponse<Manga[]>> {

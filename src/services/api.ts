@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import { Manga } from '../features/manga/types/Manga';
+import { Manga, MangaPreview } from '../features/manga/types/Manga';
 import { Platform } from 'react-native';
 import { config } from '../config/config';
 import { mockMangaApi } from './mockApi';
@@ -13,6 +13,11 @@ const DEV_API_URL = Platform.select({
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || DEV_API_URL;
 
+// Log the API URL for debugging
+console.log('API URL:', API_URL);
+console.log('Platform:', Platform.OS);
+console.log('Is Mock API:', config.useMocks);
+
 export const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -20,6 +25,53 @@ export const api = axios.create({
   },
   timeout: 10000, // 10 second timeout
 });
+
+// Add request interceptor for debugging
+api.interceptors.request.use(
+  (config) => {
+    console.log('🚀 Request:', {
+      method: config.method?.toUpperCase(),
+      url: config.baseURL + config.url,
+      data: config.data,
+      headers: config.headers,
+    });
+    return config;
+  },
+  (error) => {
+    console.error('❌ Request Error:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor for debugging
+api.interceptors.response.use(
+  (response) => {
+    console.log('✅ Response:', {
+      status: response.status,
+      url: response.config.url,
+      data: response.data,
+    });
+    return response;
+  },
+  (error) => {
+    if (error.code === 'ECONNABORTED') {
+      console.error('⏱️ Request timeout');
+      return Promise.reject(new Error('La requête a pris trop de temps à répondre'));
+    }
+    if (!error.response) {
+      console.error('🌐 Network error:', error.message);
+      return Promise.reject(new Error('Impossible de se connecter au serveur. Vérifiez votre connexion.'));
+    }
+    console.error('❌ Response Error:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      url: error.config?.url,
+      data: error.response?.data,
+      message: error.message
+    });
+    return Promise.reject(error);
+  }
+);
 
 // Add response interceptor for better error handling
 api.interceptors.response.use(
@@ -37,16 +89,6 @@ api.interceptors.response.use(
   }
 );
 
-// Types pour les réponses de l'API
-export interface ApiResponse<T> {
-  data?: T;
-  error?: string;
-}
-
-interface ApiErrorResponse {
-  message: string;
-}
-
 // Intercepteur pour les erreurs
 api.interceptors.response.use(
   (response) => response,
@@ -60,6 +102,16 @@ api.interceptors.response.use(
   }
 );
 
+// Types pour les réponses de l'API
+export interface ApiResponse<T> {
+  data?: T;
+  error?: string;
+}
+
+interface ApiErrorResponse {
+  message: string;
+}
+
 // Types pour l'API
 export interface MangaApi {
   getAllMangas: () => Promise<ApiResponse<Manga[]>>;
@@ -67,7 +119,7 @@ export interface MangaApi {
   createManga: (titre: string) => Promise<ApiResponse<Manga>>;
   deleteManga: (id: number) => Promise<ApiResponse<void>>;
   getFilters: () => Promise<ApiResponse<FiltersResponse>>;
-  getTreeLastMangas: () => Promise<ApiResponse<Manga[]>>;
+  getThreeLastMangas: () => Promise<ApiResponse<MangaPreview[]>>;
   searchMangasByTitle: (query: string) => Promise<ApiResponse<Manga[]>>;
   updateVolumeStatus: (mangaId: number, volumeId: number, achete: boolean) => Promise<ApiResponse<Manga>>;
   updateVolumesStatus: (mangaId: number, volumeIds: number[], achete: boolean) => Promise<ApiResponse<Manga>>;
@@ -115,9 +167,9 @@ export const mangaApi: MangaApi = config.useMocks ? mockMangaApi : {
   },
 
   // Récupérer les trois derniers mangas
-  getTreeLastMangas: async (): Promise<ApiResponse<Manga[]>> => {
+  getThreeLastMangas: async (): Promise<ApiResponse<MangaPreview[]>> => {
     try {
-      const { data } = await api.get<Manga[]>('/mangas/tree-last');
+      const { data } = await api.get<MangaPreview[]>('/mangas/three-last');
       return { data };
     } catch (error) {
       const axiosError = error as AxiosError<ApiErrorResponse>;
